@@ -194,9 +194,15 @@ export default function CheckoutPage() {
       });
 
       if (!emailResponse.ok) {
-        const errorText = await emailResponse.text();
-        console.error('Email API response error:', emailResponse.status, errorText);
-        throw new Error(`Failed to send order email: ${emailResponse.status} ${errorText}`);
+        const errorData = await emailResponse.json().catch(() => ({ message: 'Unknown error' }));
+        console.error('Email API response error:', emailResponse.status, errorData);
+        
+        // Check if it's a configuration error
+        if (errorData.message && errorData.message.includes('configuration error')) {
+          throw new Error(`Email configuration error: ${errorData.message}`);
+        } else {
+          throw new Error(`Failed to send order email: ${emailResponse.status} ${errorData.message || 'Unknown error'}`);
+        }
       }
 
       console.log('Order email sent successfully');
@@ -243,8 +249,10 @@ ${orderSummary}
       });
       
       // More specific error messages
-      if (error.message.includes('Failed to send order email')) {
-        alert('Order saved but failed to send email. Please contact support.');
+      if (error.message.includes('Email configuration error')) {
+        alert('Order saved successfully! However, there was an issue with email notifications. Please contact support to complete your order.');
+      } else if (error.message.includes('Failed to send order email')) {
+        alert('Order saved but failed to send email notification. Please contact support to complete your order.');
       } else if (error.message.includes('Firestore')) {
         alert('Failed to save order to database. Please try again.');
       } else {

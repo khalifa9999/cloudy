@@ -65,7 +65,7 @@ export default function AboutPage() {
     {
       name: "Dan (The Boss)",
       position: "Founder & Chief ATV Specialist",
-      image: "/public/images/home/Dan-logo.png",
+      image: "/images/logo-A.jpg",
       description: "Built this ATV parts business from the ground up. Loves a good ATV and a great deal."
     },
     {

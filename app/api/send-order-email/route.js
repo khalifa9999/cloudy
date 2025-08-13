@@ -5,14 +5,51 @@ export async function POST(request) {
   try {
     const { orderDetails, cartItems, selectedPaymentMethod } = await request.json();
 
+    // Validate environment variables
+    if (!process.env.GMAIL_USER) {
+      console.error('Missing GMAIL_USER environment variable');
+      return NextResponse.json(
+        { success: false, message: 'Email configuration error: GMAIL_USER not set' },
+        { status: 500 }
+      );
+    }
+
+    if (!process.env.GMAIL_APP_PASSWORD) {
+      console.error('Missing GMAIL_APP_PASSWORD environment variable');
+      return NextResponse.json(
+        { success: false, message: 'Email configuration error: GMAIL_APP_PASSWORD not set' },
+        { status: 500 }
+      );
+    }
+
+    if (!process.env.ADMIN_EMAIL) {
+      console.error('Missing ADMIN_EMAIL environment variable');
+      return NextResponse.json(
+        { success: false, message: 'Email configuration error: ADMIN_EMAIL not set' },
+        { status: 500 }
+      );
+    }
+
     // Create transporter using Gmail SMTP
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: process.env.GMAIL_USER, // Your Gmail address
-        pass: process.env.GMAIL_APP_PASSWORD // Your Gmail app password
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
       }
     });
+
+    // Verify transporter configuration
+    try {
+      await transporter.verify();
+      console.log('Email transporter verified successfully');
+    } catch (verifyError) {
+      console.error('Email transporter verification failed:', verifyError);
+      return NextResponse.json(
+        { success: false, message: 'Email configuration error: Invalid Gmail credentials' },
+        { status: 500 }
+      );
+    }
 
     // Format cart items for email
     const cartItemsHtml = cartItems.map(item => `
@@ -93,23 +130,38 @@ export async function POST(request) {
     // Email options
     const mailOptions = {
       from: process.env.GMAIL_USER,
-      to: process.env.ADMIN_EMAIL, // Admin email address
+      to: process.env.ADMIN_EMAIL,
       subject: `New Order - ${orderDetails.firstName} ${orderDetails.lastName}`,
       html: emailHtml
     };
 
+    console.log('Attempting to send email to:', process.env.ADMIN_EMAIL);
+
     // Send email
-    await transporter.sendMail(mailOptions);
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', result.messageId);
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Order email sent successfully' 
+      message: 'Order email sent successfully',
+      messageId: result.messageId
     });
 
   } catch (error) {
     console.error('Error sending order email:', error);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Failed to send order email';
+    if (error.code === 'EAUTH') {
+      errorMessage = 'Email authentication failed. Please check Gmail credentials.';
+    } else if (error.code === 'ECONNECTION') {
+      errorMessage = 'Email connection failed. Please check internet connection.';
+    } else if (error.message) {
+      errorMessage = `Email error: ${error.message}`;
+    }
+
     return NextResponse.json(
-      { success: false, message: 'Failed to send order email' },
+      { success: false, message: errorMessage, error: error.message },
       { status: 500 }
     );
   }
