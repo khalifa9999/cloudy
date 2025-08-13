@@ -59,11 +59,11 @@ export default function Footer() {
               </li>
               <li className="flex items-center">
                 <PhoneIcon className="w-5 h-5 mr-3 text-gray-400 flex-shrink-0" />
-                <span>402-371-7002</span>
+                <span>+1 760-307-4541</span>
               </li>
               <li className="flex items-center">
                 <EnvelopeIcon className="w-5 h-5 mr-3 text-gray-400 flex-shrink-0" />
-                <span>parts@powersportsnation.com</span>
+                <span>cloudyautosalvage@gmail.com</span>
               </li>
             </ul>
           </div>
