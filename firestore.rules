@@ -1,0 +1,51 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && 
+             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Helper function to validate order data
+    function isValidOrder() {
+      return request.resource.data.keys().hasAll(['customerInfo', 'orderItems', 'paymentMethod', 'totalItems', 'orderStatus', 'createdAt', 'updatedAt']) &&
+             request.resource.data.customerInfo.keys().hasAll(['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'state', 'zipCode']) &&
+             request.resource.data.orderItems is list &&
+             request.resource.data.orderItems.size() > 0 &&
+             request.resource.data.orderStatus == 'pending';
+    }
+
+    // Allow anyone to read UTV & ATV parts (for shop page)
+    match /utvAtvParts/{partId} {
+      allow read: if true; // Allow public read access
+      allow write: if request.auth != null; // Allow authenticated users to write
+    }
+
+    // Allow anyone to read blogs
+    match /blogs/{blogId} {
+      allow read: if true;
+      allow write: if request.auth != null; // Allow authenticated users to write
+    }
+
+    // User profiles - allow users to read/write their own profile, admins to read all
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isAdmin());
+      allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+
+    // Allow public access to create orders with validation
+    match /orders/{orderId} {
+      allow create: if isValidOrder(); // Allow public creation with validation
+      allow read, update, delete: if request.auth != null; // Only authenticated users can read/update/delete
+    }
+
+    // Deny everything else by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+} 
