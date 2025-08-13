@@ -122,8 +122,8 @@ export default function Header() {
     <div className="w-full bg-blue-900 text-white text-xs py-1 px-4 flex justify-between items-center">
       <div className="flex items-center gap-4">
         <PhoneIcon className="w-4 h-4 inline-block mr-1" />
-        <span>Call: <a href="tel:18001234567" className="underline">1-800-123-4567</a></span>
-        <span className="hidden sm:inline-block">| support@autoshop.com</span>
+        <span>Call: <a href="tel:17603074541" className="underline">1-760-307-4541</a></span>
+        <span className="hidden sm:inline-block">| cloudyautosalvage@gmail.com</span>
       </div>
       <div className="flex items-center gap-4">
         <Link href="/help" className="flex items-center gap-1 hover:underline"><QuestionMarkCircleIcon className="w-4 h-4" /> Help</Link>
