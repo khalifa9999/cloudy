@@ -259,7 +259,7 @@ export default function AboutPage() {
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Milestones</h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-sm sm:text-base">
-              Key moments that made Dan’s Scrap Yard the legend it is today.
+              Key moments that made Cloudy Scrap Yard the legend it is today.
             </p>
           </div>
           <div className="relative">

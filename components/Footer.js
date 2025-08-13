@@ -55,7 +55,7 @@ export default function Footer() {
             <ul className="space-y-3 text-gray-600 text-sm">
               <li className="flex items-start">
                 <MapPinIcon className="w-5 h-5 mr-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                <span>84786 US-81, Norfolk, NE 68701</span>
+                <span>9105 W Riggin Ave, Visalia, CA 93291, United States</span>
               </li>
               <li className="flex items-center">
                 <PhoneIcon className="w-5 h-5 mr-3 text-gray-400 flex-shrink-0" />
