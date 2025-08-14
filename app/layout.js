@@ -2,6 +2,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "../lib/AuthContext";
 import { CartProvider } from "../lib/CartContext";
+import Navigation from "../components/Navigation";
+import Footer from "../components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ATV Parts Pro - Premium ATV Parts & Accessories",
-  description: "Your trusted source for premium ATV parts, accessories, and equipment. Shop Kawasaki, Arctic Cat, Polaris, Can-Am, Yamaha, John Deere, Kubota, Bombardier, Bobcat, Land Pride, CF Moto and more.",
+  title: "PowerSports Parts - Premium ATV, UTV, Motorcycle & Snowmobile Parts",
+  description: "Your trusted source for premium powersports parts and accessories. Shop Kawasaki, Polaris, Can-Am, Yamaha, Arctic Cat, Honda, Ski-Doo, Harley-Davidson, KTM, Suzuki and more.",
 };
 
 export default function RootLayout({ children }) {
@@ -30,7 +32,13 @@ export default function RootLayout({ children }) {
       >
         <AuthProvider>
           <CartProvider>
-            {children}
+            <div className="flex flex-col min-h-screen">
+              <Navigation />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </div>
           </CartProvider>
         </AuthProvider>
       </body>

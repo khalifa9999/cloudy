@@ -23,7 +23,7 @@ export default function CartPage() {
 
   // Remove subtotal, tax, shipping, total
 
-  const handleGetQuote = () => {
+  const handlePlaceOrder = () => {
     // Redirect to checkout page
     router.push('/checkout')
   }
@@ -154,18 +154,18 @@ export default function CartPage() {
               {/* Order Summary */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 sticky top-6">
-                  <h2 className="text-xl font-semibold mb-6 text-gray-900">Quote Summary</h2>
+                  <h2 className="text-xl font-semibold mb-6 text-gray-900">Order Summary</h2>
 
                   {/* Remove subtotal, tax, shipping, total */}
                   <div className="space-y-4">
-                    <div className="text-gray-600 text-sm">Review your selected items and click below to request a quote.</div>
+                    <div className="text-gray-600 text-sm">Review your selected items and click below to place your order.</div>
                   </div>
 
                   <button
                     className="w-full mt-6 bg-black text-white py-4 rounded-xl font-semibold text-lg hover:bg-gray-900 transition-colors shadow-lg hover:shadow-xl"
-                    onClick={handleGetQuote}
+                    onClick={handlePlaceOrder}
                   >
-                    Get Quote
+                    Place Order
                   </button>
 
                   <div className="mt-4 text-center">
@@ -180,7 +180,7 @@ export default function CartPage() {
                       <div className="w-4 h-4 bg-green-100 rounded-full flex items-center justify-center">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       </div>
-                      Secure quote request
+                      Secure order placement
                     </div>
                   </div>
                 </div>
