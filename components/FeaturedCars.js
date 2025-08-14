@@ -72,7 +72,7 @@ export default function FeaturedParts() {
                   onClick={() => router.push('/checkout')}
                   className="w-full bg-gray-900 hover:bg-gray-800 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors mt-2"
                 >
-                  Get Quote
+                  Place Order
                 </button>
               </div>
             </div>

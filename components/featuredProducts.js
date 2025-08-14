@@ -152,7 +152,7 @@ export default function FeaturedProducts() {
                       className="flex-1 bg-white/90 backdrop-blur-sm text-gray-800 py-2 px-2 rounded text-xs font-medium hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center space-x-1 shadow-lg"
                     >
                       <ShoppingCart className="h-3 w-3" />
-                      <span>Get Quote</span>
+                      <span>Place Order</span>
                     </button>
                     <button className="flex-1 bg-white/90 backdrop-blur-sm text-gray-800 py-2 px-2 rounded text-xs font-medium hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center space-x-1 shadow-lg">
                       <Eye className="h-3 w-3" />
