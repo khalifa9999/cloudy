@@ -52,8 +52,8 @@ export default function AdminDashboard() {
       hoverColor: 'hover:bg-blue-600'
     },
     {
-      title: 'Import Products',
-      description: 'Import products from JSON, CSV, or manual entry',
+      title: 'Bulk Import Products',
+      description: 'Import products from Excel, CSV, or JSON files',
       icon: ArrowUpTrayIcon,
       href: '/admin/import',
       color: 'bg-green-500',
