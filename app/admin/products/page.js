@@ -207,6 +207,8 @@ function ProductModal({ open, onClose, onSave, product, mode = 'add' }) {
     weight: '',
     condition: 'New',
     partNumber: '',
+    price: '',
+    originalPrice: '',
     images: [],
     description: '',
     specifications: '',
@@ -237,6 +239,8 @@ function ProductModal({ open, onClose, onSave, product, mode = 'add' }) {
         year: product.year || '',
         condition: product.condition || 'New',
         partNumber: product.partNumber || '',
+        price: product.price || '',
+        originalPrice: product.originalPrice || '',
         description: product.description || '',
         specifications: product.specifications || '',
         warranty: product.warranty || '',
@@ -257,6 +261,8 @@ function ProductModal({ open, onClose, onSave, product, mode = 'add' }) {
         weight: '',
         condition: 'New',
         partNumber: '',
+        price: '',
+        originalPrice: '',
         images: [],
         description: '',
         specifications: '',
@@ -496,6 +502,36 @@ function ProductModal({ open, onClose, onSave, product, mode = 'add' }) {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="block text-gray-700 font-semibold">Price ($)</label>
+                <input 
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm" 
+                  placeholder="e.g., 99.99" 
+                  value={form.price} 
+                  onChange={e => setForm({ ...form, price: e.target.value })} 
+                  required
+                  readOnly={isPreview} 
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="block text-gray-700 font-semibold">Original Price ($)</label>
+                <input 
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="w-full border border-gray-300 p-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-sm" 
+                  placeholder="e.g., 129.99 (optional)" 
+                  value={form.originalPrice} 
+                  onChange={e => setForm({ ...form, originalPrice: e.target.value })} 
+                  readOnly={isPreview} 
+                />
+              </div>
+            </div>
+
 
 
 
@@ -691,6 +727,21 @@ function ProductPreviewModal({ open, onClose, product }) {
               <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
                 <div className="text-xs sm:text-sm text-gray-500 font-medium">Weight</div>
                 <div className="font-semibold text-gray-800 truncate" title={product.weight}>{product.weight}</div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
+                  <div className="text-xs sm:text-sm text-gray-500 font-medium">Price</div>
+                  <div className="font-semibold text-gray-800 truncate" title={product.price ? `$${parseFloat(product.price).toFixed(2)}` : 'N/A'}>
+                    {product.price ? `$${parseFloat(product.price).toFixed(2)}` : 'N/A'}
+                  </div>
+                </div>
+                <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">
+                  <div className="text-xs sm:text-sm text-gray-500 font-medium">Original Price</div>
+                  <div className="font-semibold text-gray-800 truncate" title={product.originalPrice ? `$${parseFloat(product.originalPrice).toFixed(2)}` : 'N/A'}>
+                    {product.originalPrice ? `$${parseFloat(product.originalPrice).toFixed(2)}` : 'N/A'}
+                  </div>
+                </div>
               </div>
 
               <div className="bg-gray-50 p-2 sm:p-3 rounded-lg">

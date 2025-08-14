@@ -113,6 +113,14 @@ function ProductCard({ product, onEdit, onDelete, onPreview }) {
                 <span className="font-medium">Weight:</span> {product.weight}
               </div>
             )}
+            {product.price && (
+              <div className="break-words">
+                <span className="font-medium">Price:</span> ${parseFloat(product.price).toFixed(2)}
+                {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
+                  <span className="text-gray-400 line-through ml-1">${parseFloat(product.originalPrice).toFixed(2)}</span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Action Buttons */}
@@ -171,6 +179,7 @@ export default function ProductTable({ products = dummyProducts, onEdit, onDelet
               <th className="p-3 text-sm font-medium">Brand</th>
               <th className="p-3 text-sm font-medium">Model</th>
               <th className="p-3 text-sm font-medium">Category</th>
+              <th className="p-3 text-sm font-medium">Price</th>
               <th className="p-3 text-sm font-medium">Weight</th>
               <th className="p-3 text-sm font-medium">Status</th>
               <th className="p-3 text-sm font-medium">Actions</th>
@@ -255,6 +264,20 @@ export default function ProductTable({ products = dummyProducts, onEdit, onDelet
                 <td className="p-3">
                   <div className="max-w-[100px] truncate" title={product.category}>
                     {product.category}
+                  </div>
+                </td>
+                <td className="p-3">
+                  <div className="max-w-[80px] truncate" title={product.price ? `$${parseFloat(product.price).toFixed(2)}` : 'N/A'}>
+                    {product.price ? (
+                      <div>
+                        <span className="font-medium">${parseFloat(product.price).toFixed(2)}</span>
+                        {product.originalPrice && parseFloat(product.originalPrice) > parseFloat(product.price) && (
+                          <div className="text-gray-400 line-through text-xs">${parseFloat(product.originalPrice).toFixed(2)}</div>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">N/A</span>
+                    )}
                   </div>
                 </td>
                 <td className="p-3">
