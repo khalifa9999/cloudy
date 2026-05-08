@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { db } from '../../../lib/firebase';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { useCart } from '../../../lib/CartContext';
 
 export default function ProductDetailPage() {
   const params = useParams();
   const productId = params?.id;
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -76,6 +78,19 @@ export default function ProductDetailPage() {
     if (product.image) return [product.image];
     return ['https://via.placeholder.com/900x600?text=No+Image'];
   }, [product]);
+
+  const handleAddToCart = () => {
+    if (!product) return;
+
+    addToCart({
+      id: product.id,
+      name: product.name || 'Unnamed Product',
+      image: product.images?.[0] || product.image || 'https://via.placeholder.com/300x200?text=No+Image',
+      brand: product.brand || 'Unknown',
+      category: product.category || 'General'
+    });
+    alert(`${product.name || 'Product'} added to cart!`);
+  };
 
   if (loading) {
     return (
@@ -150,6 +165,15 @@ export default function ProductDetailPage() {
                 <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
                   In Stock
                 </span>
+              </div>
+
+              <div className="mb-6">
+                <button
+                  onClick={handleAddToCart}
+                  className="w-full sm:w-auto bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Add to Cart
+                </button>
               </div>
 
               {product.description && (
