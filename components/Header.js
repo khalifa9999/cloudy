@@ -44,11 +44,24 @@ export default function Header() {
   const mobileAccountRef = useRef();
   const { user, loading, signOut } = useAuth();
   const { getCartItemCount } = useCart();
+  const [cartBounce, setCartBounce] = useState(false);
+  const previousCartCount = useRef(0);
   const [allProducts, setAllProducts] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestionLoading, setSuggestionLoading] = useState(false);
   const router = useRouter();
+  const cartItemCount = getCartItemCount();
+
+  useEffect(() => {
+    if (cartItemCount > previousCartCount.current) {
+      setCartBounce(true);
+      const timer = setTimeout(() => setCartBounce(false), 650);
+      previousCartCount.current = cartItemCount;
+      return () => clearTimeout(timer);
+    }
+    previousCartCount.current = cartItemCount;
+  }, [cartItemCount]);
 
   // Fetch all products on mount
   useEffect(() => {
@@ -247,7 +260,11 @@ export default function Header() {
           {/* Cart Icon */}
           <Link href="/cart" className="relative flex items-center text-gray-700 hover:text-blue-700 w-10 h-10 justify-center">
             <ShoppingCartIcon className="w-7 h-7" />
-            <span className="absolute -top-1.5 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">{getCartItemCount()}</span>
+            {cartItemCount > 0 && (
+              <span className={`absolute -top-1.5 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 ${cartBounce ? 'animate-bounce' : ''}`}>
+                {cartItemCount}
+              </span>
+            )}
           </Link>
           {/* Animated Hamburger */}
           <button
@@ -535,14 +552,22 @@ export default function Header() {
               </div>
               <Link href="/cart" className="relative flex items-center text-gray-700 hover:text-blue-700">
                 <ShoppingCartIcon className="w-7 h-7" />
-                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">{getCartItemCount()}</span>
+                {cartItemCount > 0 && (
+                  <span className={`absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 ${cartBounce ? 'animate-bounce' : ''}`}>
+                    {cartItemCount}
+                  </span>
+                )}
               </Link>
             </div>
             {/* Mobile Cart & Hamburger */}
             <div className="md:hidden flex items-center">
               <Link href="/cart" className="relative flex items-center text-gray-700 hover:text-blue-700">
                 <ShoppingCartIcon className="w-7 h-7" />
-                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">{getCartItemCount()}</span>
+                {cartItemCount > 0 && (
+                  <span className={`absolute -top-2 -right-2 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5 ${cartBounce ? 'animate-bounce' : ''}`}>
+                    {cartItemCount}
+                  </span>
+                )}
               </Link>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
