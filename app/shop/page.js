@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
@@ -295,11 +296,13 @@ export default function ShopPage() {
                   <div key={product.id} className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
                     {/* Product Image */}
                     <div className="relative h-48 bg-gray-200">
-                      <img
-                        src={product.images[0] || 'https://via.placeholder.com/300x200?text=No+Image'}
-                        alt={product.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <Link href={`/product/${product.id}`} className="block w-full h-full">
+                        <img
+                          src={product.images[0] || 'https://via.placeholder.com/300x200?text=No+Image'}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </Link>
                       <div className="absolute top-2 right-2 flex gap-1">
                         <button
                           onClick={() => addToWishlist(product)}
@@ -307,12 +310,12 @@ export default function ShopPage() {
                         >
                           <HeartIcon className="h-4 w-4 text-gray-600" />
                         </button>
-                        <button
-                          onClick={() => window.open(`/product/${product.id}`, '_blank')}
+                        <Link
+                          href={`/product/${product.id}`}
                           className="p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors"
                         >
                           <EyeIcon className="h-4 w-4 text-gray-600" />
-                        </button>
+                        </Link>
                       </div>
                     </div>
 
@@ -327,9 +330,9 @@ export default function ShopPage() {
                         </span>
                       </div>
                       
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                      <Link href={`/product/${product.id}`} className="block font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-blue-700">
                         {product.name}
-                      </h3>
+                      </Link>
                       
                       <div className="flex items-center gap-1 mb-2">
                         {[...Array(5)].map((_, i) => (
