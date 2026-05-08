@@ -206,7 +206,7 @@ export default function DealOfTheDay() {
 
   // --- WHATSAPP INTEGRATION FUNCTION ---
   function getWhatsAppLink(deal, quantity = 1) {
-    const phoneNumber = "17733651240" // 773-365-1240 in international format
+    const phoneNumber = "15597034544" // 559-703-4544 in international format
     const message = `Hi! I'm interested in getting a quote for:\n\nProduct: ${deal.name}\nBrand: ${deal.details?.brand || ''}\nMaterial: ${deal.details?.material || ''}\nCompatibility: ${deal.details?.compatibility || ''}\nQuantity: ${quantity}\n\nCould you please provide me with pricing and availability?`
     return `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
   }

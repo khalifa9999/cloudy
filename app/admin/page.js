@@ -7,39 +7,47 @@ import {
   PlusIcon, 
   ArrowUpTrayIcon, 
   ChartBarIcon,
-  CurrencyDollarIcon,
   ShoppingBagIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  CheckBadgeIcon
 } from '@heroicons/react/24/outline';
+import { db } from '../../lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 export default function AdminDashboard() {
   const [products, setProducts] = useState([]);
   const [stats, setStats] = useState({
     totalProducts: 0,
-    totalValue: 0,
     lowStock: 0,
-    categories: 0
+    categories: 0,
+    inStock: 0
   });
 
   useEffect(() => {
-    // Load products from localStorage
-    const savedProducts = localStorage.getItem('products');
-    if (savedProducts) {
-      const productsData = JSON.parse(savedProducts);
-      setProducts(productsData);
-      
-      // Calculate stats
-      const totalValue = productsData.reduce((sum, product) => sum + (product.price * product.stockQuantity), 0);
-      const lowStock = productsData.filter(product => product.stockQuantity < 5).length;
-      const categories = new Set(productsData.map(product => product.category)).size;
-      
-      setStats({
-        totalProducts: productsData.length,
-        totalValue: totalValue,
-        lowStock: lowStock,
-        categories: categories
-      });
-    }
+    const loadProducts = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'utvAtvParts'));
+        const productsData = snapshot.docs.map((item) => ({
+          id: item.id,
+          ...item.data(),
+        }));
+        setProducts(productsData);
+
+        const lowStock = productsData.filter(product => (product.stockQuantity || 0) < 5).length;
+        const categories = new Set(productsData.map(product => product.category)).size;
+
+        setStats({
+          totalProducts: productsData.length,
+          lowStock: lowStock,
+          categories: categories,
+          inStock: productsData.length
+        });
+      } catch (error) {
+        console.error('Error loading products:', error);
+      }
+    };
+
+    loadProducts();
   }, []);
 
   const adminCards = [
@@ -78,9 +86,9 @@ export default function AdminDashboard() {
       textColor: 'text-blue-600'
     },
     {
-      title: 'Total Inventory Value',
-      value: `$${stats.totalValue.toLocaleString()}`,
-      icon: CurrencyDollarIcon,
+      title: 'Products In Stock',
+      value: stats.inStock,
+      icon: CheckBadgeIcon,
       color: 'bg-green-500',
       textColor: 'text-green-600'
     },
@@ -180,9 +188,6 @@ export default function AdminDashboard() {
                       Category
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Price
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Stock
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -215,24 +220,13 @@ export default function AdminDashboard() {
                         {product.category}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${product.price}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          product.stockQuantity < 5 
-                            ? 'bg-red-100 text-red-800' 
-                            : 'bg-green-100 text-green-800'
-                        }`}>
-                          {product.stockQuantity}
+                        <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                          In Stock
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          product.status === 'Active' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {product.status}
+                        <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                          Active
                         </span>
                       </td>
                     </tr>

@@ -99,7 +99,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900 mb-1">PHONE</p>
-                      <p className="text-gray-600">773-365-1240</p>
+                      <p className="text-gray-600">559-703-4544</p>
                     </div>
                   </div>
 
@@ -109,7 +109,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900 mb-1">ADDRESS</p>
-                      <p className="text-gray-600">1425 N McLean Blvd Elgin, IL</p>
+                      <p className="text-gray-600">7249 E Parlier Ave, Fowler, CA 93625</p>
                     </div>
                   </div>
 
@@ -119,7 +119,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900 mb-1">EMAIL</p>
-                      <p className="text-gray-600">office@steponetrains.com</p>
+                      <p className="text-gray-600">Crystalautosalvage@gmail.com</p>
                     </div>
                   </div>
                 </div>
@@ -151,7 +151,7 @@ export default function ContactPage() {
           <div className="w-full">
             <div className="w-full h-64 md:h-80 lg:h-96 bg-gray-200 rounded-2xl overflow-hidden shadow-lg">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2965.0824050173574!2d-88.30814492346!3d42.037334971208976!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x880f0c8c8c8c8c8c%3A0x8c8c8c8c8c8c8c8c!2s1425%20N%20McLean%20Blvd%2C%20Elgin%2C%20IL%2060123!5e0!3m2!1sen!2sus!4v1234567890123"
+                src="https://www.google.com/maps?q=7249+E+Parlier+Ave,+Fowler,+CA+93625&output=embed"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

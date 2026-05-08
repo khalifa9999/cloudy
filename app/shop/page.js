@@ -9,7 +9,6 @@ import {
   HeartIcon,
   EyeIcon
 } from '@heroicons/react/24/outline';
-import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 import { db } from '../../lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 
@@ -21,7 +20,6 @@ export default function ShopPage() {
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedVehicleType, setSelectedVehicleType] = useState('');
-  const [priceRange, setPriceRange] = useState([0, 1000]);
   const [sortBy, setSortBy] = useState('name');
   const [showFilters, setShowFilters] = useState(false);
 
@@ -73,7 +71,7 @@ export default function ShopPage() {
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchTerm.toLowerCase())
+        (product.description || '').toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -92,20 +90,11 @@ export default function ShopPage() {
       filtered = filtered.filter(product => product.vehicleType === selectedVehicleType);
     }
 
-    // Price range filter
-    filtered = filtered.filter(product => 
-      product.price >= priceRange[0] && product.price <= priceRange[1]
-    );
-
     // Sort
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'name':
           return a.name.localeCompare(b.name);
-        case 'price-low':
-          return a.price - b.price;
-        case 'price-high':
-          return b.price - a.price;
         case 'rating':
           return b.rating - a.rating;
         case 'newest':
@@ -116,7 +105,7 @@ export default function ShopPage() {
     });
 
     setFilteredProducts(filtered);
-  }, [products, searchTerm, selectedBrand, selectedCategory, selectedVehicleType, priceRange, sortBy]);
+  }, [products, searchTerm, selectedBrand, selectedCategory, selectedVehicleType, sortBy]);
 
   const brands = [...new Set(products.map(p => p.brand))].sort();
   const categories = [...new Set(products.map(p => p.category))].sort();
@@ -216,8 +205,6 @@ export default function ShopPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="name">Name A-Z</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
                   <option value="rating">Highest Rated</option>
                   <option value="newest">Newest First</option>
                 </select>
@@ -268,39 +255,6 @@ export default function ShopPage() {
                 </select>
               </div>
 
-              {/* Price Range Filter */}
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price Range: ${priceRange[0]} - ${priceRange[1]}
-                </label>
-                <div className="space-y-2">
-                  <input
-                    type="range"
-                    min="0"
-                    max="1000"
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                    className="w-full"
-                  />
-                  <div className="flex gap-2">
-                    <input
-                      type="number"
-                      placeholder="Min"
-                      value={priceRange[0]}
-                      onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
-                      className="w-1/2 px-2 py-1 border border-gray-300 rounded text-sm"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Max"
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 1000])}
-                      className="w-1/2 px-2 py-1 border border-gray-300 rounded text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-
               {/* Clear Filters */}
               <button
                 onClick={() => {
@@ -308,7 +262,6 @@ export default function ShopPage() {
                   setSelectedBrand('');
                   setSelectedCategory('');
                   setSelectedVehicleType('');
-                  setPriceRange([0, 1000]);
                   setSortBy('name');
                 }}
                 className="w-full bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200 transition-colors"
@@ -361,11 +314,6 @@ export default function ShopPage() {
                           <EyeIcon className="h-4 w-4 text-gray-600" />
                         </button>
                       </div>
-                      {product.originalPrice > product.price && (
-                        <div className="absolute top-2 left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-medium">
-                          SALE
-                        </div>
-                      )}
                     </div>
 
                     {/* Product Info */}
@@ -399,32 +347,15 @@ export default function ShopPage() {
                         </span>
                       </div>
 
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-bold text-gray-900">
-                            ${product.price}
-                          </span>
-                          {product.originalPrice > product.price && (
-                            <span className="text-sm text-gray-500 line-through">
-                              ${product.originalPrice}
-                            </span>
-                          )}
-                        </div>
-                        <span className={`text-xs px-2 py-1 rounded ${
-                          product.stockQuantity > 10 
-                            ? 'bg-green-100 text-green-800' 
-                            : product.stockQuantity > 0 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {product.stockQuantity > 0 ? `${product.stockQuantity} in stock` : 'Out of stock'}
+                      <div className="flex items-center justify-end mb-3">
+                        <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-800">
+                          In Stock
                         </span>
                       </div>
 
                       <button
                         onClick={() => addToCart(product)}
-                        disabled={product.stockQuantity === 0}
-                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                       >
                         <ShoppingCartIcon className="h-4 w-4" />
                         Add to Cart

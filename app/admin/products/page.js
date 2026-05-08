@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PlusIcon, PencilIcon, TrashIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { db } from '../../../lib/firebase';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -51,19 +53,32 @@ export default function AdminProducts() {
   const brands = ['Kawasaki', 'Polaris', 'Can-Am', 'Yamaha', 'Arctic Cat', 'Honda', 'Ski-Doo', 'Harley-Davidson', 'KTM', 'Suzuki'];
 
   useEffect(() => {
-    // Load products from localStorage or API
-    const savedProducts = localStorage.getItem('products');
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
-    }
+    const loadProducts = async () => {
+      try {
+        const snapshot = await getDocs(collection(db, 'utvAtvParts'));
+        const productsData = snapshot.docs.map((item) => ({
+          id: item.id,
+          ...item.data(),
+        }));
+        setProducts(productsData);
+      } catch (error) {
+        console.error('Error loading products:', error);
+      }
+    };
+
+    loadProducts();
   }, []);
 
-  const saveProducts = (newProducts) => {
-    localStorage.setItem('products', JSON.stringify(newProducts));
-    setProducts(newProducts);
+  const refreshProducts = async () => {
+    const snapshot = await getDocs(collection(db, 'utvAtvParts'));
+    const productsData = snapshot.docs.map((item) => ({
+      id: item.id,
+      ...item.data(),
+    }));
+    setProducts(productsData);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     const newProduct = {
@@ -77,11 +92,24 @@ export default function AdminProducts() {
       images: formData.images.filter(img => img.trim() !== '')
     };
 
-    if (editingProduct) {
-      const updatedProducts = products.map(p => p.id === editingProduct.id ? newProduct : p);
-      saveProducts(updatedProducts);
-    } else {
-      saveProducts([...products, newProduct]);
+    try {
+      if (editingProduct) {
+        await updateDoc(doc(db, 'utvAtvParts', editingProduct.id), {
+          ...newProduct,
+          updatedAt: serverTimestamp()
+        });
+      } else {
+        const { id, ...productPayload } = newProduct;
+        await addDoc(collection(db, 'utvAtvParts'), {
+          ...productPayload,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+      }
+      await refreshProducts();
+    } catch (error) {
+      console.error('Error saving product:', error);
+      return;
     }
 
     setFormData({
@@ -118,10 +146,14 @@ export default function AdminProducts() {
     setShowForm(true);
   };
 
-  const handleDelete = (productId) => {
+  const handleDelete = async (productId) => {
     if (confirm('Are you sure you want to delete this product?')) {
-      const updatedProducts = products.filter(p => p.id !== productId);
-      saveProducts(updatedProducts);
+      try {
+        await deleteDoc(doc(db, 'utvAtvParts', productId));
+        await refreshProducts();
+      } catch (error) {
+        console.error('Error deleting product:', error);
+      }
     }
   };
 
@@ -426,9 +458,6 @@ export default function AdminProducts() {
                     Category
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Stock
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -464,19 +493,12 @@ export default function AdminProducts() {
                       {product.category}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ${product.price}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {product.stockQuantity}
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                        In Stock
+                      </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        product.status === 'Active' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {product.status}
-                      </span>
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex gap-2">
