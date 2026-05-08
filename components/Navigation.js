@@ -9,9 +9,11 @@ import {
   UserIcon,
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
+import { useAuth } from '../lib/AuthContext';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, isAdmin } = useAuth();
 
   const navigation = [
     { name: 'Home', href: '/' },
@@ -56,25 +58,27 @@ export default function Navigation() {
           {/* Right side */}
           <div className="flex items-center space-x-4">
             {/* Admin Dropdown */}
-            <div className="relative hidden md:block">
-              <div className="group">
-                <button className="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
-                  <Cog6ToothIcon className="h-5 w-5 mr-1" />
-                  Admin
-                </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                  {adminNavigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+            {isAdmin && (
+              <div className="relative hidden md:block">
+                <div className="group">
+                  <button className="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    <Cog6ToothIcon className="h-5 w-5 mr-1" />
+                    Admin
+                  </button>
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    {adminNavigation.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Cart */}
             <Link href="/cart" className="text-gray-700 hover:text-blue-600 p-2 rounded-md transition-colors">
@@ -82,7 +86,7 @@ export default function Navigation() {
             </Link>
 
             {/* User */}
-            <Link href="/signin" className="text-gray-700 hover:text-blue-600 p-2 rounded-md transition-colors">
+            <Link href={user ? "/admin/profile" : "/signin"} className="text-gray-700 hover:text-blue-600 p-2 rounded-md transition-colors">
               <UserIcon className="h-6 w-6" />
             </Link>
 
@@ -119,21 +123,23 @@ export default function Navigation() {
             ))}
             
             {/* Mobile Admin Section */}
-            <div className="border-t pt-4 mt-4">
-              <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
-                Admin
+            {isAdmin && (
+              <div className="border-t pt-4 mt-4">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
+                  Admin
+                </div>
+                {adminNavigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
               </div>
-              {adminNavigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 rounded-md text-base font-medium transition-colors"
-                  onClick={() => setIsOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
+            )}
           </div>
         </div>
       )}

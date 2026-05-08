@@ -10,6 +10,8 @@ import {
   EyeIcon
 } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
+import { db } from '../../lib/firebase';
+import { collection, getDocs } from 'firebase/firestore';
 
 export default function ShopPage() {
   const [products, setProducts] = useState([]);
@@ -24,23 +26,42 @@ export default function ShopPage() {
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
-    // Load products from localStorage
-    const savedProducts = localStorage.getItem('products');
-    if (savedProducts) {
-      const productsData = JSON.parse(savedProducts);
-      setProducts(productsData);
-      setFilteredProducts(productsData);
-    } else {
-      // Load from sample products if no localStorage data
-      fetch('/sample-products.json')
-        .then(res => res.json())
-        .then(data => {
-          setProducts(data);
-          setFilteredProducts(data);
-        })
-        .catch(err => console.error('Error loading products:', err));
-    }
-    setLoading(false);
+    const loadProducts = async () => {
+      try {
+        // Primary source: Firestore (used by the bulk importer/legacy script)
+        const snapshot = await getDocs(collection(db, 'utvAtvParts'));
+        if (!snapshot.empty) {
+          const firestoreProducts = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+          setProducts(firestoreProducts);
+          setFilteredProducts(firestoreProducts);
+          return;
+        }
+
+        // Fallback: browser localStorage (used by admin product manager)
+        const savedProducts = localStorage.getItem('products');
+        if (savedProducts) {
+          const productsData = JSON.parse(savedProducts);
+          setProducts(productsData);
+          setFilteredProducts(productsData);
+          return;
+        }
+
+        // Final fallback: static seed file
+        const res = await fetch('/sample-products.json');
+        const data = await res.json();
+        setProducts(data);
+        setFilteredProducts(data);
+      } catch (err) {
+        console.error('Error loading products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProducts();
   }, []);
 
   useEffect(() => {
