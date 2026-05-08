@@ -154,7 +154,7 @@ export default function Header() {
         {/* Logo at the top, centered */}
         <div className="flex justify-center items-center py-2">
           <Link href="/" className="flex items-center space-x-3 group">
-            <Image src="/images/logo-A.jpg" alt="UTV & ATV Parts Pro Logo" width={120} height={90} className="transition-transform group-hover:scale-110" />
+            <Image src="/images/home/utv-atv-parts-pro-logo.svg" alt="UTV & ATV Parts Pro Logo" width={180} height={52} className="transition-transform group-hover:scale-110" priority />
           </Link>
         </div>
         {/* Row: Profile | Search | Hamburger */}
@@ -400,7 +400,7 @@ export default function Header() {
             {/* Logo */}
             <div className="flex items-center flex-shrink-0">
               <Link href="/" className="flex items-center space-x-3 group">
-                <Image src="/images/logo-A.jpg" alt="UTV & ATV Parts Pro Logo" width={120} height={90} className="transition-transform group-hover:scale-110" />
+                <Image src="/images/home/utv-atv-parts-pro-logo.svg" alt="UTV & ATV Parts Pro Logo" width={180} height={52} className="transition-transform group-hover:scale-110" priority />
               </Link>
             </div>
             {/* Search Bar */}

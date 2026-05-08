@@ -120,8 +120,8 @@ export default function SignInPage() {
           <div className="text-center space-y-4">
             <div className="mx-auto w-12 h-12 flex items-center justify-center">
               <img
-                src="/images/logo-A.jpg"
-                alt="Logo"
+                src="/images/home/utv-atv-parts-pro-logo.svg"
+                alt="UTV & ATV Parts Pro Logo"
                 className="max-w-[150px] max-h-[80px] object-contain rounded-full mx-auto my-auto"
               />
             </div>
