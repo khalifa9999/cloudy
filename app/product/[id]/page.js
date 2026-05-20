@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { db } from '../../../lib/firebase';
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import { useCart } from '../../../lib/CartContext';
+import Header from '../../../components/Header';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -115,8 +116,9 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-6">
           <Link href="/shop" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
             ← Back to Shop

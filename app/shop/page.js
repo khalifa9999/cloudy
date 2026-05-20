@@ -13,6 +13,7 @@ import {
 import { db } from '../../lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import { useCart } from '../../lib/CartContext';
+import Header from '../../components/Header';
 
 export default function ShopPage() {
   const { addToCart } = useCart();
@@ -150,7 +151,7 @@ export default function ShopPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      <Header />
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
