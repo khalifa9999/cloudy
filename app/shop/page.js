@@ -12,8 +12,10 @@ import {
 } from '@heroicons/react/24/outline';
 import { db } from '../../lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
+import { useCart } from '../../lib/CartContext';
 
 export default function ShopPage() {
+  const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -112,25 +114,14 @@ export default function ShopPage() {
   const categories = [...new Set(products.map(p => p.category))].sort();
   const vehicleTypes = [...new Set(products.map(p => p.vehicleType))].sort();
 
-  const addToCart = (product) => {
-    // Get existing cart from localStorage
-    const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    
-    // Check if product already exists in cart
-    const existingItem = existingCart.find(item => item.id === product.id);
-    
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      existingCart.push({
-        ...product,
-        quantity: 1
-      });
-    }
-    
-    localStorage.setItem('cart', JSON.stringify(existingCart));
-    
-    // Show success message (you can implement a toast notification here)
+  const handleAddToCart = (product) => {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      image: product.images?.[0] || product.image || '/placeholder.svg',
+      brand: product.brand,
+      category: product.category,
+    });
     alert(`${product.name} added to cart!`);
   };
 
@@ -357,7 +348,7 @@ export default function ShopPage() {
                       </div>
 
                       <button
-                        onClick={() => addToCart(product)}
+                        onClick={() => handleAddToCart(product)}
                         className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
                       >
                         <ShoppingCartIcon className="h-4 w-4" />
