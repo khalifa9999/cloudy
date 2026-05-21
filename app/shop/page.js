@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { 
   MagnifyingGlassIcon, 
   FunnelIcon, 
@@ -15,8 +16,9 @@ import { collection, getDocs } from 'firebase/firestore';
 import { useCart } from '../../lib/CartContext';
 import Header from '../../components/Header';
 
-export default function ShopPage() {
+function ShopPageContent() {
   const { addToCart } = useCart();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,15 +69,21 @@ export default function ShopPage() {
   }, []);
 
   useEffect(() => {
+    const q = searchParams.get('search');
+    if (q) setSearchTerm(decodeURIComponent(q));
+  }, [searchParams]);
+
+  useEffect(() => {
     let filtered = [...products];
 
     // Search filter
     if (searchTerm) {
+      const q = searchTerm.toLowerCase();
       filtered = filtered.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (product.description || '').toLowerCase().includes(searchTerm.toLowerCase())
+        (product.name || '').toLowerCase().includes(q) ||
+        (product.brand || '').toLowerCase().includes(q) ||
+        (product.category || '').toLowerCase().includes(q) ||
+        (product.description || '').toLowerCase().includes(q)
       );
     }
 
@@ -364,5 +372,17 @@ export default function ShopPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ShopPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Loading shop...</p>
+      </div>
+    }>
+      <ShopPageContent />
+    </Suspense>
   );
 }

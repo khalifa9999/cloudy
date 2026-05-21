@@ -63,25 +63,37 @@ export default function Header() {
     previousCartCount.current = cartItemCount;
   }, [cartItemCount]);
 
+  const mapProduct = (id, data) => ({
+    id,
+    name: data.name || 'Unnamed Product',
+    image: data.images?.[0] || data.image || '/images/atv1.jpg',
+    price: data.price || 0,
+    brand: data.brand || 'Unknown',
+    category: data.category || '',
+    description: data.function || data.description || '',
+  });
+
   // Fetch all products on mount
   useEffect(() => {
     async function fetchAllProducts() {
       setSuggestionLoading(true);
       try {
         const snapshot = await getDocs(collection(db, 'utvAtvParts'));
-        const products = snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            name: data.name || 'Unnamed Product',
-            image: data.images?.[0] || data.image || '/images/atv1.jpg',
-            price: data.price || 0,
-            brand: data.brand || 'Unknown',
-            description: data.function || data.description || '',
-          };
-        });
-        setAllProducts(products);
-        console.log('[Header] Products fetched:', products.length, products);
+        if (!snapshot.empty) {
+          setAllProducts(snapshot.docs.map(doc => mapProduct(doc.id, doc.data())));
+          return;
+        }
+
+        const savedProducts = localStorage.getItem('products');
+        if (savedProducts) {
+          const list = JSON.parse(savedProducts);
+          setAllProducts(list.map(p => mapProduct(p.id, p)));
+          return;
+        }
+
+        const res = await fetch('/sample-products.json');
+        const data = await res.json();
+        setAllProducts(data.map(p => mapProduct(p.id, p)));
       } catch (e) {
         console.error('[Header] Error fetching products:', e);
       } finally {
@@ -90,21 +102,41 @@ export default function Header() {
     }
     fetchAllProducts();
   }, []);
+
+  const goToProduct = (product) => {
+    setShowSuggestions(false);
+    setSearch('');
+    router.push(`/product/${product.id}`);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const query = search.trim();
+    if (!query) return;
+
+    if (suggestions.length > 0) {
+      goToProduct(suggestions[0]);
+      return;
+    }
+
+    setShowSuggestions(false);
+    router.push(`/shop?search=${encodeURIComponent(query)}`);
+  };
+
   // Filter suggestions as user types
   useEffect(() => {
-    console.log('[Header] search value:', search);
     if (search.trim() === '') {
       setSuggestions([]);
       return;
     }
     const q = search.toLowerCase();
     const filtered = allProducts.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.brand.toLowerCase().includes(q) ||
-      p.description.toLowerCase().includes(q)
+      (p.name || '').toLowerCase().includes(q) ||
+      (p.brand || '').toLowerCase().includes(q) ||
+      (p.category || '').toLowerCase().includes(q) ||
+      (p.description || '').toLowerCase().includes(q)
     ).slice(0, 8);
     setSuggestions(filtered);
-    console.log('[Header] Suggestions:', filtered);
   }, [search, allProducts]);
 
   // Close mobile account dropdown on outside click
@@ -224,7 +256,7 @@ export default function Header() {
             )}
           </div>
           {/* Search Bar */}
-          <form className="flex-1 relative" onSubmit={e => e.preventDefault()}>
+          <form className="flex-1 relative" onSubmit={handleSearchSubmit}>
             <input 
               type="text" 
               placeholder="Search..." 
@@ -245,7 +277,7 @@ export default function Header() {
                   <button
                     key={product.id}
                     className="flex items-center w-full gap-3 px-2 py-2 hover:bg-blue-50 rounded transition-colors"
-                    onMouseDown={e => { e.preventDefault(); router.push(`/shop?search=${encodeURIComponent(product.name)}`); setShowSuggestions(false); setSearch(product.name); }}
+                    onMouseDown={e => { e.preventDefault(); goToProduct(product); }}
                   >
                     <img src={product.image} alt={product.name} className="w-10 h-10 object-contain rounded border" />
                     <div className="flex-1 text-left">
@@ -314,7 +346,7 @@ export default function Header() {
             >
               {/* Slick Mobile Search Bar */}
               <div className="pt-2 pb-4">
-                <form className="relative" onSubmit={e => e.preventDefault()} autoComplete="off">
+                <form className="relative" onSubmit={handleSearchSubmit} autoComplete="off">
                   <span className={`absolute left-4 top-1/2 -translate-y-1/2 transition-transform duration-200 ${searchFocused ? 'scale-110 text-black' : 'text-gray-400'} pointer-events-none`}>
                     <MagnifyingGlassIcon className="w-5 h-5" />
                   </span>
@@ -323,8 +355,8 @@ export default function Header() {
                     type="text"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
-                    onFocus={() => setSearchFocused(true)}
-                    onBlur={() => setSearchFocused(false)}
+                    onFocus={() => { setSearchFocused(true); setShowSuggestions(true); }}
+                    onBlur={() => { setSearchFocused(false); setTimeout(() => setShowSuggestions(false), 150); }}
                     placeholder="Search ATV parts or keywords"
                     className={`w-full pl-12 pr-10 py-3 border transition-all duration-200 rounded-full bg-white placeholder-gray-500 outline-none text-base
                       ${searchFocused ? 'border-red-500' : 'border-gray-200'}
@@ -354,7 +386,7 @@ export default function Header() {
                         <button
                           key={product.id}
                           className="flex items-center w-full gap-3 px-2 py-2 hover:bg-blue-50 rounded transition-colors"
-                          onMouseDown={e => { e.preventDefault(); router.push(`/shop?search=${encodeURIComponent(product.name)}`); setShowSuggestions(false); setSearch(product.name); }}
+                          onMouseDown={e => { e.preventDefault(); goToProduct(product); }}
                         >
                           <img src={product.image} alt={product.name} className="w-10 h-10 object-contain rounded border" />
                           <div className="flex-1 text-left">
@@ -422,7 +454,7 @@ export default function Header() {
             </div>
             {/* Search Bar */}
             <div className="hidden md:flex flex-1 justify-center px-6 overflow-visible">
-              <form className="w-96 flex relative overflow-visible" onSubmit={e => e.preventDefault()} autoComplete="off">
+              <form className="w-96 flex relative overflow-visible" onSubmit={handleSearchSubmit} autoComplete="off">
                 <span className={`absolute left-4 top-1/2 -translate-y-1/2 transition-transform duration-200 ${searchFocused ? 'scale-110 text-blue-500' : 'text-gray-400'} pointer-events-none`}>
                   <MagnifyingGlassIcon className="w-5 h-5" />
                 </span>
@@ -462,7 +494,7 @@ export default function Header() {
                       <button
                         key={product.id}
                         className="flex items-center w-full gap-3 px-2 py-2 hover:bg-blue-50 rounded transition-colors"
-                        onMouseDown={e => { e.preventDefault(); router.push(`/shop?search=${encodeURIComponent(product.name)}`); setShowSuggestions(false); setSearch(product.name); }}
+                        onMouseDown={e => { e.preventDefault(); goToProduct(product); }}
                       >
                         <img src={product.image} alt={product.name} className="w-10 h-10 object-contain rounded border" />
                         <div className="flex-1 text-left">
